@@ -1,6 +1,8 @@
+mod gui;
 use anyhow::Result;
 use clap::Parser;
 use std::path::PathBuf;
+use egui::ViewportBuilder;
 
 use Fmto::{ConfigConverterFactory, ConfigFormat};
 
@@ -9,7 +11,7 @@ use Fmto::{ConfigConverterFactory, ConfigFormat};
 struct Args {
     /// 输入文件路径
     #[arg(short = 'i', long)]
-    input: PathBuf,
+    input: Option<PathBuf>,
 
     /// 输出文件路径（可选，可以指定多个）
     #[arg(short = 'o', long, num_args = 1..)]
@@ -26,6 +28,10 @@ struct Args {
     /// 输出文件格式（可选，可以指定多个，与输出文件一一对应）
     #[arg(short = 't', long, num_args = 1..)]
     output_format: Vec<String>,
+
+    /// 启动图形界面
+    #[arg(short = 'g', long)]
+    gui: bool,
 }
 
 fn ensure_dir_exists(path: &PathBuf) -> Result<()> {
@@ -38,19 +44,42 @@ fn ensure_dir_exists(path: &PathBuf) -> Result<()> {
 fn main() -> Result<()> {
     let args = Args::parse();
 
+    // 如果没有指定输入文件或指定了 GUI 模式，启动图形界面
+    if args.input.is_none() || args.gui {
+        let options = eframe::NativeOptions {
+            viewport: ViewportBuilder::default()
+                .with_inner_size([800.0, 600.0]),
+            ..Default::default()
+        };
+        
+        // 使用 std::process::exit 来处理错误
+        if let Err(e) = eframe::run_native(
+            "Fmto - 配置文件格式转换工具",
+            options,
+            Box::new(|cc| Box::new(gui::FmtoApp::new(cc))),
+        ) {
+            eprintln!("GUI 错误: {}", e);
+            std::process::exit(1);
+        }
+        return Ok(());
+    }
+
+    // 命令行模式
+    let input = args.input.unwrap();
+
     // 从文件扩展名确定输入格式
     let input_format = args.input_format
         .map(|f| ConfigFormat::from_extension(&f))
         .flatten()
         .or_else(|| {
-            args.input.extension()
+            input.extension()
                 .and_then(|ext| ext.to_str())
                 .and_then(|ext| ConfigFormat::from_extension(ext))
         })
         .ok_or_else(|| anyhow::anyhow!("无法确定输入文件格式"))?;
 
     // 读取输入文件
-    let content = std::fs::read_to_string(&args.input)?;
+    let content = std::fs::read_to_string(&input)?;
 
     // 获取输入转换器并解析
     let input_converter = ConfigConverterFactory::get_converter(input_format);
@@ -61,7 +90,7 @@ fn main() -> Result<()> {
         args.output
     } else if let Some(output_dir) = args.output_dir {
         // 如果指定了输出目录但没有指定输出文件，则使用输入文件名加上所有输出格式的扩展名
-        let file_stem = args.input.file_stem()
+        let file_stem = input.file_stem()
             .and_then(|s| s.to_str())
             .ok_or_else(|| anyhow::anyhow!("无法获取输入文件名"))?;
         
@@ -83,7 +112,7 @@ fn main() -> Result<()> {
             .collect()
     } else {
         // 如果没有指定输出文件或输出目录，则使用输入文件名加上输出格式的扩展名
-        let file_stem = args.input.file_stem()
+        let file_stem = input.file_stem()
             .and_then(|s| s.to_str())
             .ok_or_else(|| anyhow::anyhow!("无法获取输入文件名"))?;
         
@@ -121,7 +150,7 @@ fn main() -> Result<()> {
         std::fs::write(output_path, output)?;
 
         println!("已转换: {} -> {} ({})", 
-            args.input.display(), 
+            input.display(), 
             output_path.display(), 
             output_format.to_extension()
         );
