@@ -13,6 +13,14 @@ Fmto 是一个用 Rust 编写的命令行工具，用于在不同格式的配置
 ## 安装
 
 ```bash
+# 克隆仓库
+git clone https://github.com/gantoho/fmto.git
+cd fmto
+
+# 构建项目
+cargo build --release
+
+# 安装fmto命令
 cargo install --path .
 ```
 
@@ -23,6 +31,11 @@ cargo install --path .
 1. 使用输入文件名和输出文件名：
 ```bash
 fmto -i input.json -o output.yaml
+```
+
+在fmto指令无法使用的时候，还可以直接使用以下指令
+```bash
+cargo run -- -i input.json -o output.yaml
 ```
 
 2. 指定输入和输出格式：
@@ -154,7 +167,7 @@ fmto -i config.xml -d output_dir -t json
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/fmto.git
+git clone https://github.com/gantoho/fmto.git
 cd fmto
 
 # 构建项目

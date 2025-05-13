@@ -1,0 +1,14 @@
+[source.crates-io]
+replace-with = 'ustc'
+
+[source.ustc]
+registry = "https://mirrors.ustc.edu.cn/crates.io-index"
+
+[source.tsinghua]
+registry = "sparse://mirrors.tuna.tsinghua.edu.cn/crates.io-index"
+
+[registries.ustc]
+index = "https://mirrors.ustc.edu.cn/crates.io-index"
+
+[registries.tsinghua]
+index = "https://mirrors.tuna.tsinghua.edu.cn/crates.io-index" 
