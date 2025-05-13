@@ -14,7 +14,7 @@ Fmto 是一个用 Rust 编写的命令行工具，用于在不同格式的配置
 
 ```bash
 # 克隆仓库
-git clone https://github.com/gantoho/fmto.git
+git clone https://github.com/xiuton/fmto.git
 cd fmto
 
 # 构建项目
@@ -143,7 +143,7 @@ fmto -i config.conf -d output_dir
 
 ```bash
 # 克隆仓库
-git clone https://github.com/gantoho/fmto.git
+git clone https://github.com/xiuton/fmto.git
 cd fmto
 
 # 构建项目
