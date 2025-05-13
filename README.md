@@ -52,87 +52,60 @@ or
 cargo run -- -i input.json -o output_dir/config.yaml
 ```
 
+4. 同时转换为多个格式：
+```bash
+# 指定多个输出文件
+fmto -i config.conf -o config.json config.toml config.yaml
+
+# 指定多个输出格式
+fmto -i config.conf -o config.json config.toml config.yaml -t json toml yaml
+
+# 使用输出目录并转换为多个格式
+fmto -i config.conf -d output_dir -t json toml yaml
+
+# 使用输出目录并转换为所有支持的格式
+fmto -i config.conf -d output_dir
+```
+
 ### 完整示例
 
-1. JSON 转 YAML：
+1. JSON 转多个格式：
 ```bash
-# 基本转换
-fmto -i config.json -o config.yaml
+# 转换为 YAML 和 TOML
+fmto -i config.json -o config.yaml config.toml
 
-# 指定格式
-fmto -i config.json -o config.yaml -f json -t yaml
+# 指定格式转换
+fmto -i config.json -o config.yaml config.toml -t yaml toml
 
 # 使用输出目录
-fmto -i config.json -d output_dir -t yaml
+fmto -i config.json -d output_dir -t yaml toml
 ```
 
-2. YAML 转 TOML：
+2. HOCON 转多个格式：
 ```bash
-# 基本转换
-fmto -i config.yaml -o config.toml
+# 转换为 JSON、YAML 和 TOML
+fmto -i config.conf -o config.json config.yaml config.toml
 
-# 指定格式
-fmto -i config.yaml -o config.toml -f yaml -t toml
+# 指定格式转换
+fmto -i config.conf -o config.json config.yaml config.toml -t json yaml toml
 
 # 使用输出目录
-fmto -i config.yaml -d output_dir -t toml
+fmto -i config.conf -d output_dir -t json yaml toml
 ```
 
-3. INI 转 JSON：
+3. 转换为所有支持的格式：
 ```bash
-# 基本转换
-fmto -i config.ini -o config.json
-
-# 指定格式
-fmto -i config.ini -o config.json -f ini -t json
-
 # 使用输出目录
-fmto -i config.ini -d output_dir -t json
-```
-
-4. HOCON 转 YAML：
-```bash
-# 基本转换
-fmto -i config.conf -o config.yaml
-
-# 指定格式
-fmto -i config.conf -o config.yaml -f hocon -t yaml
-
-# 使用输出目录
-fmto -i config.conf -d output_dir -t yaml
-```
-
-5. ENV 转 TOML：
-```bash
-# 基本转换
-fmto -i config.env -o config.toml
-
-# 指定格式
-fmto -i config.env -o config.toml -f env -t toml
-
-# 使用输出目录
-fmto -i config.env -d output_dir -t toml
-```
-
-6. XML 转 JSON：
-```bash
-# 基本转换
-fmto -i config.xml -o config.json
-
-# 指定格式
-fmto -i config.xml -o config.json -f xml -t json
-
-# 使用输出目录
-fmto -i config.xml -d output_dir -t json
+fmto -i config.conf -d output_dir
 ```
 
 ### 命令行参数
 
 - `-i, --input <INPUT>`: 输入文件路径（必需）
-- `-o, --output <OUTPUT>`: 输出文件路径（可选）
+- `-o, --output <OUTPUT>`: 输出文件路径（可选，可以指定多个）
 - `-d, --output-dir <OUTPUT_DIR>`: 输出目录（可选）
 - `-f, --input-format <INPUT_FORMAT>`: 输入文件格式（可选，将根据文件扩展名自动检测）
-- `-t, --output-format <OUTPUT_FORMAT>`: 输出文件格式（可选，将根据文件扩展名自动检测）
+- `-t, --output-format <OUTPUT_FORMAT>`: 输出文件格式（可选，可以指定多个，与输出文件一一对应）
 
 ### 支持的格式
 
@@ -152,6 +125,8 @@ fmto -i config.xml -d output_dir -t json
 2. 如果指定了输出目录，程序会自动创建不存在的目录
 3. 如果不指定输入或输出格式，程序会根据文件扩展名自动检测格式
 4. 所有转换都会保持数据的结构和类型信息
+5. 当指定多个输出文件时，如果不指定输出格式，程序会根据文件扩展名自动检测格式
+6. 当使用输出目录时，如果不指定输出格式，程序会转换为所有支持的格式
 
 ## 错误处理
 
@@ -162,6 +137,7 @@ fmto -i config.xml -d output_dir -t json
 3. 输入文件格式无效
 4. 输出目录创建失败
 5. 文件写入失败
+6. 输出格式与输出文件数量不匹配
 
 ## 开发
 
