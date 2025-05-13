@@ -36,7 +36,7 @@ fmto -i input.json -d output_dir -t yaml
 ```
 or
 ```bash
-cargo run -- -i config.json -o output_dir/config.yaml
+cargo run -- -i input.json -o output_dir/config.yaml
 ```
 
 ### 完整示例
