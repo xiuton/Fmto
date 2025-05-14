@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use crate::{ConfigConverterFactory, ConfigFormat};
 use eframe::egui::{FontDefinitions, FontFamily};
 use std::process::Command;
+use std::env;
 
 pub struct FmtoApp {
     input_path: Option<PathBuf>,
@@ -120,16 +121,18 @@ impl FmtoApp {
     }
 }
 
+// 内置字体数据
+const NOTO_SANS_SC_REGULAR: &[u8] = include_bytes!("../assets/fonts/NotoSansSC-Regular.ttf");
+
 impl eframe::App for FmtoApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         // 加载字体
         let mut fonts = FontDefinitions::default();
         
-        // 加载中文字体
-        let font_data = std::fs::read("assets/fonts/NotoSansSC-Regular.ttf").unwrap();
+        // 使用内置字体数据
         fonts.font_data.insert(
             "noto_sans_sc".to_owned(),
-            egui::FontData::from_owned(font_data),
+            egui::FontData::from_owned(NOTO_SANS_SC_REGULAR.to_vec()),
         );
 
         // 将中文字体设置为默认字体
