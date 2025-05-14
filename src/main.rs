@@ -21,6 +21,10 @@ struct Args {
     #[arg(short = 'd', long)]
     output_dir: Option<PathBuf>,
 
+    /// 输出文件名（可选，可以指定多个，与输出格式一一对应）
+    #[arg(short = 'n', long, num_args = 1..)]
+    output_names: Vec<String>,
+
     /// 输入文件格式
     #[arg(short = 'f', long)]
     input_format: Option<String>,
@@ -87,12 +91,22 @@ fn main() -> Result<()> {
 
     // 确定输出文件列表
     let output_files = if !args.output.is_empty() {
-        args.output
+        if let Some(output_dir) = &args.output_dir {
+            // 如果同时指定了输出目录和输出文件，则将输出文件路径组合起来
+            args.output.into_iter()
+                .map(|path| output_dir.join(path))
+                .collect()
+        } else {
+            args.output
+        }
     } else if let Some(output_dir) = args.output_dir {
-        // 如果指定了输出目录但没有指定输出文件，则使用输入文件名加上所有输出格式的扩展名
-        let file_stem = input.file_stem()
-            .and_then(|s| s.to_str())
-            .ok_or_else(|| anyhow::anyhow!("无法获取输入文件名"))?;
+        // 如果指定了输出目录但没有指定输出文件，则使用指定的文件名或默认文件名"output"
+        let file_stem = if !args.output_names.is_empty() {
+            // 使用指定的文件名
+            args.output_names[0].clone()
+        } else {
+            "output".to_string()
+        };
         
         // 确保输出目录存在
         std::fs::create_dir_all(&output_dir)?;
@@ -108,13 +122,24 @@ fn main() -> Result<()> {
         };
 
         formats.into_iter()
-            .map(|ext| output_dir.join(format!("{}.{}", file_stem, ext)))
+            .enumerate()
+            .map(|(i, ext)| {
+                let name = if i < args.output_names.len() {
+                    args.output_names[i].clone()
+                } else {
+                    file_stem.clone()
+                };
+                output_dir.join(format!("{}.{}", name, ext))
+            })
             .collect()
     } else {
-        // 如果没有指定输出文件或输出目录，则使用输入文件名加上输出格式的扩展名
-        let file_stem = input.file_stem()
-            .and_then(|s| s.to_str())
-            .ok_or_else(|| anyhow::anyhow!("无法获取输入文件名"))?;
+        // 如果没有指定输出文件或输出目录，则使用指定的文件名或默认文件名"output"
+        let file_stem = if !args.output_names.is_empty() {
+            // 使用指定的文件名
+            args.output_names[0].clone()
+        } else {
+            "output".to_string()
+        };
         
         // 如果没有指定输出格式，则使用输入格式
         let formats = if args.output_format.is_empty() {
@@ -124,7 +149,15 @@ fn main() -> Result<()> {
         };
 
         formats.into_iter()
-            .map(|ext| PathBuf::from(format!("{}.{}", file_stem, ext)))
+            .enumerate()
+            .map(|(i, ext)| {
+                let name = if i < args.output_names.len() {
+                    args.output_names[i].clone()
+                } else {
+                    file_stem.clone()
+                };
+                PathBuf::from(format!("{}.{}", name, ext))
+            })
             .collect()
     };
 

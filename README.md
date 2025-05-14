@@ -132,6 +132,7 @@ fmto -i config.conf -d output_dir
 - `-d, --output-dir <OUTPUT_DIR>`: 输出目录（可选）
 - `-f, --input-format <INPUT_FORMAT>`: 输入文件格式（可选，将根据文件扩展名自动检测）
 - `-t, --output-format <OUTPUT_FORMAT>`: 输出文件格式（可选，可以指定多个，与输出文件一一对应）
+- `-n, --name <NAME>`: 输出文件名（可选，可以指定多个）
 - `-g, --gui`: 启动图形界面（可选）
 
 ### 支持的格式
