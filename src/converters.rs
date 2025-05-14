@@ -114,6 +114,13 @@ impl ConfigConverter for crate::XmlConverter {
     }
 
     fn format(&self, config: &ConfigValue) -> Result<String> {
-        Ok(quick_xml::se::to_string(&config.value)?)
+        let mut xml_content = String::from("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<config>\n");
+        
+        for (key, value) in &config.value {
+            xml_content.push_str(&format!("  <{}>{}</{}>\n", key, value, key));
+        }
+        
+        xml_content.push_str("</config>");
+        Ok(xml_content)
     }
 } 
