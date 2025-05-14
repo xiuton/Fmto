@@ -251,6 +251,8 @@ impl Parser {
             
             if matches!(self.current_token, Token::Comma) {
                 self.advance()?;
+            } else if !matches!(self.current_token, Token::RightBrace) {
+                return Err(anyhow!("期望 , 或 }}"));
             }
         }
         

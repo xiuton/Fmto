@@ -87,7 +87,6 @@ impl ConfigConverter for crate::HoconConverter {
     }
 
     fn format(&self, config: &ConfigValue) -> Result<String> {
-        // 将配置转换为 HOCON 格式
         let mut output = String::new();
         format_hocon_value(&mut output, &config.value, 0)?;
         Ok(output)

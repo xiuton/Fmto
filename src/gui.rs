@@ -2,6 +2,7 @@ use eframe::egui;
 use rfd::FileDialog;
 use std::path::PathBuf;
 use crate::{ConfigConverterFactory, ConfigFormat};
+use eframe::egui::{FontDefinitions, FontFamily};
 
 pub struct FmtoApp {
     input_path: Option<PathBuf>,
@@ -112,6 +113,26 @@ impl FmtoApp {
 
 impl eframe::App for FmtoApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        // 加载字体
+        let mut fonts = FontDefinitions::default();
+        
+        // 加载中文字体
+        let font_data = std::fs::read("assets/fonts/NotoSansSC-Regular.ttf").unwrap();
+        fonts.font_data.insert(
+            "noto_sans_sc".to_owned(),
+            egui::FontData::from_owned(font_data),
+        );
+
+        // 将中文字体设置为默认字体
+        fonts
+            .families
+            .get_mut(&FontFamily::Proportional)
+            .unwrap()
+            .insert(0, "noto_sans_sc".to_owned());
+
+        // 应用字体设置
+        ctx.set_fonts(fonts);
+
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("Fmto - 配置文件格式转换工具");
             ui.add_space(10.0);
